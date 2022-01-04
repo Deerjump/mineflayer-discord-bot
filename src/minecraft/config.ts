@@ -4,5 +4,7 @@ export const options: BotOptions = {
   username: process.env.MINECRAFT_USERNAME!,
   password: process.env.MINECRAFT_PASSWORD!,
   auth: 'microsoft',
-  version: '1.17'
+  host: 'mc.hypixel.net',
+  version: '1.17.1',
+  logErrors: true,
 };

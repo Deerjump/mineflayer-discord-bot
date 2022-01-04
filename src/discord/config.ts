@@ -1,5 +1,5 @@
 import { Intents } from "discord.js";
-import { DiscordBotOptions } from "../types";
+import { DiscordBotOptions } from "@customTypes";
 
 export const options: DiscordBotOptions = {
   intents: new Intents(['GUILDS', 'GUILD_MESSAGES']),

@@ -18,7 +18,9 @@
     "discord.js": "^13.4.0",
     "dotenv": "^10.0.0",
     "mineflayer": "^3.13.1",
-    "pm2": "^5.1.2"
+    "pm2": "^5.1.2",
+    "prismarine-viewer": "^1.21.0",
+    "typed-emitter": "^1.4.0"
   },
   "devDependencies": {
     "rimraf": "3.0.2",

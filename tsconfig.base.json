@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    "target": "es2020",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    /* IMPORTANT: only use these for Types/Interfaces. Do not use them for Classes or JS modules */
+    "paths": {
+      "@customTypes": ["./src/typings/types.d.ts"]
+    }
+  },
+  "exclude": ["dist/**/*", "resources/**/*"]
+}

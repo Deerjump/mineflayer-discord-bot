@@ -1,10 +1,10 @@
-import { DiscordBot, DiscordEventHandler } from "../../types";
+import { DiscordClient, DiscordEventHandler } from "@customTypes";
 
 const eventHandler: DiscordEventHandler = {
   event: "ready",
   once: true,
-  handle(client: DiscordBot) {
-    console.log(`${client.user?.username} is ready!`);
+  handle(client: DiscordClient) {
+    console.log(`[Discord]: ${client.user?.username} is ready!`);
   },
 };
 

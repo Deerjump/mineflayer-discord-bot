@@ -1,15 +1,28 @@
 import { Client, TextBasedChannel } from "discord.js";
-import { DiscordBot, DiscordBotOptions, DiscordEventHandler } from "../types";
+import {
+  ChatEvents,
+  DiscordClient,
+  DiscordBotOptions,
+  DiscordEventHandler
+} from "@customTypes";
 import * as fs from "fs";
+import TypedEmitter from "typed-emitter";
 
-export class Bot extends Client implements DiscordBot {
-  readonly config: DiscordBotOptions;
-
-  constructor(config: DiscordBotOptions) {
+export class DiscordBot extends Client implements DiscordClient {
+  private chatChannel!: TextBasedChannel;
+  constructor(private config: DiscordBotOptions, public eventBridge: TypedEmitter<ChatEvents>) {
     super({ intents: config.intents });
-    this.config = config;
+
+    this.setupEventBridge();
   }
 
+  private setupEventBridge() {
+    this.eventBridge.on('minecraftMessage', async (content) => {
+      this.chatChannel.send({ content });
+    });
+  }
+
+  // TODO: maybe abstract this out
   private async loadEvents() {
     console.log("Loading events...");
 
@@ -25,16 +38,19 @@ export class Bot extends Client implements DiscordBot {
     console.log(`Loaded ${count} events`);
   }
 
-  async send(content: string) {
-    let channel = this.channels.cache.get(this.config.channelId);
-    if (channel == null) throw new Error("channel does not exist!");
-    if (!channel.isText()) throw new Error("channel must be a TextBasedChannel");
-    channel = channel as TextBasedChannel;
-    channel.send({ content });
-  }
+  async sendSkipRequest() {}
 
   async login(token: string) {
     await this.loadEvents();
-    return super.login(token);
+    await super.login(token);
+    this.getChatChannel();
+    return '';
+  }
+
+  async getChatChannel() {
+    const channel = await this.channels.fetch(this.config.channelId);
+    if (channel == null) throw new Error("channel does not exist!");
+    if (!channel.isText()) throw new Error("channel must be a TextBasedChannel");
+    this.chatChannel = channel as TextBasedChannel;
   }
 }
