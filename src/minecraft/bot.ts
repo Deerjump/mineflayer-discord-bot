@@ -29,10 +29,14 @@ export class MineflayerBot {
     });
     this.minecraft.on("end", (why) => console.log(why));
     this.minecraft.on("chat", (username, message, _, json) => {
-      console.log(json.json)
+      if (username === this.minecraft.username || username === 'playing') return;
       const role = extractRole(json.json.text)?.replace(' ', '');
       this.eventBridge.emit('minecraftMessage', `\`${role}\` **${username}**: ${message}`);
     });
+
+    this.minecraft.on('whisper', (username, message, _, json) => {
+      console.log(json);
+    })
 
     this.minecraft.once("spawn", () => this.goToHousing());
   }
