@@ -1,14 +1,15 @@
-import { Message } from "discord.js";
-import { DiscordEventHandler, DiscordClient } from "@customTypes";
-import { options } from "../config";
+import { ClientEvents } from 'discord.js';
+import { DiscordClient } from '@customTypes';
+import { options } from '../config';
+import { createEventHandler } from '../../utils/utils';
 
-const eventHandler: DiscordEventHandler = {
-  event: "messageCreate",
-  handle(message: Message) {
-    if (message.channelId !== options.channelId || message.author.bot) return;
+const eventHandler = createEventHandler<ClientEvents>()({
+  event: 'messageCreate',
+  handle(message) {
+    if (message.channelId !== options.chatChannelId || message.author.bot) return;
     const client = message.client as DiscordClient;
     client.eventBridge.emit('discordMessage', message.content);
   },
-};
+});
 
 export = eventHandler;
