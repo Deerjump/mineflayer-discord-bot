@@ -5,3 +5,6 @@ export const FULL_HOUSE = 'That house is full! Try another house!';
 export const ALREADY_CONNECTED = 'You are already connected to this server';
 export const TRY_AGAIN = 'Try again in a second.';
 export const BAN_COMMAND = '/housing ban'
+// chat VariousHumanity completed the parkour in 24:49.850!
+export const PARKOUR_COMPLETION_MESSAGE = 'completed the parkour in'
+export const WHISPER_COMMAND = '/msg'

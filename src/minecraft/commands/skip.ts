@@ -7,7 +7,7 @@ export const command: MinecraftCommand = {
   aliases: [],
   execute: (bot: MineflayerBot, username: string) => {
     console.log(`skip`, username);
-    bot.eventBridge.emit('skipRequest', username);
+    bot.eventBridge.emit('skipRequestCommand', username);
   },
 };
 
