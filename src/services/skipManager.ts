@@ -16,23 +16,22 @@ import {
   SKIP_CANCEL_ID,
   SKIP_DECLINE_BUTTON,
   SKIP_DECLINE_ID,
-} from '../constants';
+} from '../discord/constants';
 
 export class SkipManager {
   private skipRequests = new Collection<string, SkipRequest>();
 
   constructor(private client: DiscordClient) {
-    this.client.eventBridge.on('skipRequest', this.createSkipRequest.bind(this));
-    this.client.eventBridge.on('skipRequestCancel', this.cancelSkipRequest.bind(this));
+    this.client.eventBridge.on('skipRequestCommand', this.createSkipRequest.bind(this));
     this.startButtonListener();
   }
 
-  startButtonListener() {
+  private startButtonListener() {
     this.client.on('interactionCreate', async (interaction) => {
       if (!interaction.isButton()) return;
-      if (interaction.channelId != this.client.config.skipChannelId) return;
+      if (interaction.channelId != this.client.getSkipChannel().id) return;
       await interaction.deferUpdate();
-      
+
       const { user } = interaction;
       const requester = interaction.message.embeds[0].author!.name;
       const request = this.skipRequests.get(requester);
@@ -57,14 +56,14 @@ export class SkipManager {
           request.accept(user);
           await interaction.editReply(request.toDiscordMessage());
           return;
-        case SKIP_APPROVE_ID:
-          this.logSkipResult(requester, `Approved by: ${accepter?.username}`);
-          break;
         case SKIP_CANCEL_ID:
-          this.logSkipResult(requester, `Canceled by: ${accepter?.username}`);
+          this.cancelSkipRequest(request);
+          break;
+        case SKIP_APPROVE_ID:
+          this.approveSkipRequest(request);
           break;
         case SKIP_DECLINE_ID:
-          this.logSkipResult(requester, `Denied by: ${accepter?.username}`);
+          this.denySkipRequest(request);
           break;
       }
       this.skipRequests.delete(requester);
@@ -78,43 +77,53 @@ export class SkipManager {
     await logChannel.send({ embeds: [embed] });
   }
 
-  async createSkipRequest(username: string) {
+  private async createSkipRequest(username: string) {
     if (this.skipRequests.has(username)) {
-      //TODO message user that they have an active skip request
+      this.client.eventBridge.emit(
+        'skipRequestFail',
+        username,
+        'An active skip request already exists!'
+      );
       return;
     }
+
     const request = new SkipRequest(username);
     this.skipRequests.set(username, request);
-    //TODO message user that it worked and is pending
+    this.client.eventBridge.emit(
+      'skipRequestCreate',
+      username  
+    );
 
-    const message = request.toDiscordMessage();
-    const channel = await this.client.getSkipChannel();
-    const sentMessage = await channel.send(message);
-    request.messageId = sentMessage.id;
+    await this.client.getSkipChannel().send(request.toDiscordMessage());
   }
 
-  async cancelSkipRequest(username: string) {
-    const request = this.skipRequests.get(username);
-    if (request == null) {
-      //TODO error message of no active skip
-      return;
-    }
+  private approveSkipRequest({ username, acceptedBy }: SkipRequest) {
+    this.logSkipResult(username, `Approved by: ${acceptedBy?.username}`);
+    this.client.eventBridge.emit('skipRequestApproved', {
+      requester: username,
+      handledBy: acceptedBy?.username!,
+    });
+  }
 
-    if (request.messageId == null) {
-      console.error(`ERROR: Request for ${request.username} has no messageId!`);
-      return;
-    }
+  private denySkipRequest({ username, acceptedBy }: SkipRequest) {
+    this.logSkipResult(username, `Denied by: ${acceptedBy?.username}`);
+    this.client.eventBridge.emit('skipRequestDenied', {
+      requester: username,
+      handledBy: acceptedBy?.username!,
+    });
+  }
 
-    const skipChannel = this.client.getSkipChannel();
-    const message = await skipChannel.messages.fetch(request.messageId);
-    await message.delete();
-    this.skipRequests.delete(request.username);
+  private async cancelSkipRequest({ username, acceptedBy }: SkipRequest) {
+    this.logSkipResult(username, `Canceled by: ${acceptedBy?.username}`);
+    this.client.eventBridge.emit('skipRequestCancelled', {
+      requester: username,
+      handledBy: acceptedBy?.username!,
+    });
   }
 }
 
 export class SkipRequest {
   acceptedBy?: User;
-  messageId?: string;
 
   constructor(readonly username: string) {}
 
@@ -128,19 +137,18 @@ export class SkipRequest {
       return { embeds: [embed], components };
     }
 
-    embed.setDescription(`Accepted by: **${this.acceptedBy?.username}**`);
-    components.push(
-      new MessageActionRow().setComponents(
-        SKIP_APPROVE_BUTTON,
-        SKIP_DECLINE_BUTTON,
-        SKIP_CANCEL_BUTTON
-      )
+    embed.setDescription(`Accepted by: **${this.acceptedBy.username}**`);
+    const row = new MessageActionRow().setComponents(
+      SKIP_APPROVE_BUTTON,
+      SKIP_DECLINE_BUTTON,
+      SKIP_CANCEL_BUTTON
     );
-    return { embeds: [embed], components };
+    components.push(row);
+
+    return { embeds: [embed], components: [row] };
   }
 
   accept(user: User) {
-    if (this.acceptedBy) return;
     this.acceptedBy = user;
   }
 }

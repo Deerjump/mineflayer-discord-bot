@@ -1,18 +1,14 @@
 import { Client, ClientEvents, TextBasedChannel } from 'discord.js';
 import { DiscordClient, DiscordBotOptions, EventHandler, EventBridge } from '@customTypes';
 import fs from 'fs';
-import { SkipManager } from './services/skipManager';
 
 export class DiscordBot extends Client implements DiscordClient {
   private chatChannel?: TextBasedChannel;
   private skipChannel?: TextBasedChannel;
   private logChannel?: TextBasedChannel;
 
-  readonly skipManager: SkipManager;
   constructor(public readonly config: DiscordBotOptions, public readonly eventBridge: EventBridge) {
     super({ intents: config.intents });
-    // TODO Does this even need to be here?
-    this.skipManager = new SkipManager(this);
   }
 
   private setupEventBridge() {
