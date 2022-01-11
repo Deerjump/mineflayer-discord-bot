@@ -22,30 +22,38 @@ export class MineflayerBot {
   constructor(options: BotOptions, eventBridge: EventBridge) {
     this.prefix = '!';
     this.eventBridge = eventBridge;
-    this.bot = createBot(options);
-
     this.loadCommands();
-    this.bot.on('error', (error) => console.error(`Error:`, error));
-    this.bot.on('end', (reason) => console.log(`End:`, reason));
+    this.bot = this.initializeBot(options);
+  }
 
-    // TODO: check if login failed
+  private initializeBot(options: BotOptions) {
+    const bot = createBot(options);
+    bot.on('error', (error) => console.error(`Error:`, error));
+    bot.on('end', async (reason) => {
+      console.log(`End:`, reason)
+      console.log('Attempting to reconnect!')
+      await wait(FIVE_SECONDS);
+      this.bot = this.initializeBot(options);
+    });
 
-    this.bot.once('login', () => {
+    bot.once('login', () => {
       console.log(`[Minecraft]: Logged in to "${options.host}" as ${this.bot.username}!`);
     });
 
-    this.bot.on('messagestr', (message, position) => {
+    bot.on('messagestr', (message, position) => {
       console.log(position, message);
     });
 
     if (options.host === HYPIXEL) {
-      this.bot.once('spawn', async () => {
-        await this.bot.waitForChunksToLoad();
+      bot.once('spawn', async () => {
+        await bot.waitForChunksToLoad();
         await this.goToHousing();
         this.startChatListeners();
         this.startSkipListeners();
       });
     }
+
+    return bot;
   }
 
   private startChatListeners() {
