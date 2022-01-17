@@ -1,13 +1,13 @@
+import { config } from 'dotenv';
+config();
 import { MineflayerBot } from './minecraft/bot';
 import * as discordConfig from './discord/config';
 import * as mineflayerConfig from './minecraft/config';
 import { DiscordClient, EventBridge } from '@customTypes';
 import { DiscordBot } from './discord/bot';
 import EventEmitter from 'events';
-import { config } from 'dotenv';
 import { SkipManager } from './services/skipManager';
 
-config();
 
 async function main() {
   const eventBridge = new EventEmitter() as EventBridge;
