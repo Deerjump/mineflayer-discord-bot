@@ -8,6 +8,7 @@ export const command: MinecraftCommand = {
   execute: ({ bot }: MineflayerBot, username: string) => {
     console.log(`restart`, username);
     bot.chat(`/msg ${username} Restarting you!`);
+    // TODO send the restart command
   },
 };
 
