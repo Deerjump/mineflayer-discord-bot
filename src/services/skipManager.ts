@@ -14,8 +14,8 @@ import {
   SKIP_APPROVE_ID,
   SKIP_CANCEL_BUTTON,
   SKIP_CANCEL_ID,
-  SKIP_DECLINE_BUTTON,
-  SKIP_DECLINE_ID,
+  SKIP_DENY_BUTTON,
+  SKIP_DENY_ID,
 } from '../discord/constants';
 
 export class SkipManager {
@@ -62,7 +62,7 @@ export class SkipManager {
         case SKIP_APPROVE_ID:
           this.approveSkipRequest(request);
           break;
-        case SKIP_DECLINE_ID:
+        case SKIP_DENY_ID:
           this.denySkipRequest(request);
           break;
       }
@@ -140,7 +140,7 @@ export class SkipRequest {
     embed.setDescription(`Accepted by: **${this.acceptedBy.username}**`);
     const row = new MessageActionRow().setComponents(
       SKIP_APPROVE_BUTTON,
-      SKIP_DECLINE_BUTTON,
+      SKIP_DENY_BUTTON,
       SKIP_CANCEL_BUTTON
     );
     components.push(row);
