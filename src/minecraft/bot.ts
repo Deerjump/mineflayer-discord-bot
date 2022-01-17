@@ -1,5 +1,5 @@
 import { createBot, Bot, BotOptions, BotEvents } from 'mineflayer';
-import { extractRole, wait } from '../utils/utils';
+import { extractRole, extractTime, wait } from '../utils/utils';
 import { EventBridge, MinecraftCommand, Predicate } from '@customTypes';
 import { FIVE_SECONDS, HYPIXEL, TWO_SECONDS } from '../utils/constants';
 import fs from 'fs';
@@ -30,8 +30,8 @@ export class MineflayerBot {
     const bot = createBot(options);
     bot.on('error', (error) => console.error(`Error:`, error));
     bot.on('end', async (reason) => {
-      console.log(`End:`, reason)
-      console.log('Attempting to reconnect!')
+      console.log(`End:`, reason);
+      console.log('Attempting to reconnect!');
       await wait(FIVE_SECONDS);
       this.bot = this.initializeBot(options);
     });
@@ -40,9 +40,9 @@ export class MineflayerBot {
       console.log(`[Minecraft]: Logged in to "${options.host}" as ${this.bot.username}!`);
     });
 
-    bot.on('messagestr', (message, position) => {
-      console.log(position, message);
-    });
+    // bot.on('messagestr', (message, position) => {
+    //   console.log(position, message);
+    // });
 
     if (options.host === HYPIXEL) {
       bot.once('spawn', async () => {
@@ -50,6 +50,7 @@ export class MineflayerBot {
         await this.goToHousing();
         this.startChatListeners();
         this.startSkipListeners();
+        this.startCompletionTimeListener();
       });
     }
 
@@ -63,6 +64,7 @@ export class MineflayerBot {
       this.getCommand(message)?.execute(this, username);
 
       const role = extractRole(json.json.text)?.replace(' ', '');
+      if (role == undefined) return;
       const formatted = `\`${role}\` **${username}**: ${message}`;
       this.eventBridge.emit('minecraftMessage', formatted);
     });
@@ -70,10 +72,22 @@ export class MineflayerBot {
     // discord -> minecraft
     this.eventBridge.on('discordMessage', (message) => {
       console.log(`[Minecraft]: ${message}`);
-      this.getCommand(message)?.execute(this, this.bot.username);
-      // this.bot.chat(message);
+      // this.getCommand(message)?.execute(this, this.bot.username);
+      this.bot.chat(message);
     });
   }
+
+  private startCompletionTimeListener() {
+    this.bot.on('chat', (username, message) => {
+      const regex = /(.+?) completed the parkour in (.*)!/;
+      const [, name, time] = message.match(regex) ?? [];
+      if (name == null || time == null) return;
+      console.log('name: ', name);
+      console.log('time: ', extractTime(time));
+    });
+  }
+
+
 
   private startSkipListeners() {
     this.eventBridge.on('skipRequestCreate', (username) => {
@@ -81,8 +95,7 @@ export class MineflayerBot {
       if (player == null) return;
       const response = 'Your request has been created and will be handled shortly';
       const message = `${WHISPER_COMMAND} ${username} ${response}`;
-      console.log(message);
-      // this.bot.chat(message);
+      this.bot.chat(message);
     });
 
     this.eventBridge.on('skipRequestCancelled', ({ requester, handledBy }) => {
@@ -90,8 +103,7 @@ export class MineflayerBot {
       if (player == null) return;
       const response = `Your skip was cancelled by ${handledBy}`;
       const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      console.log(message);
-      // this.bot.chat(message);
+      this.bot.chat(message);
     });
 
     this.eventBridge.on('skipRequestApproved', ({ requester, handledBy }) => {
@@ -99,8 +111,7 @@ export class MineflayerBot {
       if (player == null) return;
       const response = `Your skip was approved by ${handledBy}`;
       const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      console.log(message);
-      // this.bot.chat(message);
+      this.bot.chat(message);
     });
 
     this.eventBridge.on('skipRequestDenied', ({ requester, handledBy }) => {
@@ -108,8 +119,7 @@ export class MineflayerBot {
       if (player == null) return;
       const response = `Your skip was denied by ${handledBy}`;
       const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      console.log(message);
-      // this.bot.chat(message);
+      this.bot.chat(message);
     });
   }
 
