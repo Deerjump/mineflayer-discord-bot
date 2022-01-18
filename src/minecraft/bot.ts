@@ -41,6 +41,7 @@ export class MineflayerBot {
     });
 
     // bot.on('messagestr', (message, position) => {
+    //   if (position != 'chat') return;
     //   console.log(position, message);
     // });
 
@@ -78,16 +79,18 @@ export class MineflayerBot {
   }
 
   private startCompletionTimeListener() {
-    this.bot.on('chat', (username, message) => {
-      const regex = /(.+?) completed the parkour in (.*)!/;
-      const [, name, time] = message.match(regex) ?? [];
-      if (name == null || time == null) return;
-      console.log('name: ', name);
-      console.log('time: ', extractTime(time));
+    this.bot.on('messagestr', (message, position) => {
+      if (position != 'chat') return;
+      const regex = /^([a-zA-Z0-_]*) completed the parkour in (.*)!/;
+      const [match, name, time] = message.match(regex) ?? [];
+      if (!match) return;
+      const [minutes, seconds, milliseconds] = extractTime(time);
+      if (minutes < 5) {
+        console.log('name:', name);
+        console.log('time:', `${minutes}:${seconds}.${milliseconds}`);
+      }
     });
   }
-
-
 
   private startSkipListeners() {
     this.eventBridge.on('skipRequestCreate', (username) => {
@@ -151,7 +154,6 @@ export class MineflayerBot {
 
   private getCommand(message: string): MinecraftCommand | undefined {
     if (!message.startsWith(this.prefix)) return;
-
     const args = message.slice(this.prefix.length).trim().split(/ +/);
     const commandName = args.shift()?.toLowerCase()!;
 
