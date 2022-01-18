@@ -8,7 +8,8 @@ const eventHandler = createEventHandler<ClientEvents>()({
   handle(message) {
     if (message.channelId !== options.chatChannelId || message.author.bot) return;
     const client = message.client as DiscordClient;
-    client.eventBridge.emit('discordMessage', message.content);
+    const content = `${message.author.username}: ${message.content}`
+    client.eventBridge.emit('discordMessage', content);
   },
 });
 
