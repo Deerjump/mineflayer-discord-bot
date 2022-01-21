@@ -12,6 +12,7 @@ export const options: MinecraftBotOptions = {
   
   // custom options
   prefix: '!',
+  parkourTimeBanThreshold: 4,
   parkourStart: {
     x: 39.5,
     y: 97.5,
