@@ -1,6 +1,6 @@
-import { createBot, Bot, BotOptions, BotEvents } from 'mineflayer';
+import { createBot, Bot, BotEvents } from 'mineflayer';
 import { extractRole, extractTime, wait } from '../utils/utils';
-import { EventBridge, MinecraftCommand, Predicate } from '@customTypes';
+import { EventBridge, Location, MinecraftBotOptions, MinecraftCommand, MineflayerBot, Predicate } from '@customTypes';
 import { FIVE_SECONDS, HYPIXEL, TWO_SECONDS } from '../utils/constants';
 import fs from 'fs';
 import { Collection } from 'discord.js';
@@ -13,20 +13,22 @@ import {
   WHISPER_COMMAND,
 } from './constants';
 
-export class MineflayerBot {
-  public bot: Bot;
-  public eventBridge: EventBridge;
+export class MinecraftBot implements MineflayerBot {
   readonly commands = new Collection<string, MinecraftCommand>();
+  readonly eventBridge: EventBridge;
+  bot: Bot;
   private prefix: string;
+  parkourStart: Location;
 
-  constructor(options: BotOptions, eventBridge: EventBridge) {
-    this.prefix = '!';
+  constructor(options: MinecraftBotOptions, eventBridge: EventBridge) {
+    this.prefix = options.prefix;
+    this.parkourStart = options.parkourStart;
     this.eventBridge = eventBridge;
     this.loadCommands();
     this.bot = this.initializeBot(options);
   }
 
-  private initializeBot(options: BotOptions) {
+  private initializeBot(options: MinecraftBotOptions) {
     const bot = createBot(options);
     bot.on('error', (error) => console.error(`Error:`, error));
     bot.on('end', async (reason) => {
@@ -152,7 +154,7 @@ export class MineflayerBot {
     });
   }
 
-  private getCommand(message: string): MinecraftCommand | undefined {
+  private getCommand(message: string) {
     if (!message.startsWith(this.prefix)) return;
     const args = message.slice(this.prefix.length).trim().split(/ +/);
     const commandName = args.shift()?.toLowerCase()!;
@@ -270,4 +272,8 @@ export class MineflayerBot {
     await wait(TWO_SECONDS);
     this.visitHousingServer('wuved');
   }
+
+  teleportPlayer(username: string, { x, y, z }: Location) {
+    this.bot.chat(`/tp ${username} ${x} ${y} ${z}`);
+  };
 }

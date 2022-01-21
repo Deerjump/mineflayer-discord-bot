@@ -1,13 +1,11 @@
 import { MinecraftCommand } from '@customTypes';
 
-import { MineflayerBot } from '../bot';
-
 export const command: MinecraftCommand = {
   name: 'skip',
   aliases: [],
-  execute: (bot: MineflayerBot, username: string) => {
+  execute: ({ eventBridge }, username) => {
     console.log(`skip`, username);
-    bot.eventBridge.emit('skipRequestCommand', username);
+    eventBridge.emit('skipRequestCommand', username);
   },
 };
 
