@@ -1,14 +1,12 @@
 import { MinecraftCommand } from '@customTypes';
 
-import { MineflayerBot } from '../bot';
-
 export const command: MinecraftCommand = {
   name: 'restart',
   aliases: [],
-  execute: ({ bot }: MineflayerBot, username: string) => {
+  execute: (minecraftBot, username) => {
     console.log(`restart`, username);
-    bot.chat(`/msg ${username} Restarting you!`);
-    // TODO send the restart command
+    // teleport player to start
+    minecraftBot.teleportPlayer(username, minecraftBot.parkourStart);
+    // reset player's skips (Future feature)
   },
 };
-
