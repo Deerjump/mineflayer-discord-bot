@@ -14,31 +14,39 @@ export class DiscordBot extends Client implements DiscordClient {
   private setupEventBridge() {
     this.eventBridge.on('minecraftMessage', this.handleMinecraftMessage.bind(this));
     this.eventBridge.on('connectionFailure', this.handleConnectionFailure.bind(this));
+    this.eventBridge.on('notifyStaff', this.notifyStaff.bind(this));
   }
 
   private async handleMinecraftMessage(message: string) {
     const messageToSend = { content: message };
 
-    const channel = await this.getChatChannel();
+    const channel = this.getChatChannel();
     await channel.send(messageToSend);
   }
 
   private async handleConnectionFailure(reason: string) {
     const message = { content: `**Trouble connecting to housing:** \`${reason}\`` };
 
-    const channel = await this.getChatChannel();
+    const channel = this.getChatChannel();
     await channel.send(message);
   }
 
-  private async loadEvents() {
+  private async notifyStaff(username: string, reason?: string) {
+    const channel = this.getChatChannel();
+
+    await channel.send(`<@&${this.config.staffRoleId}> ${username} requests your help!`);
+  }
+
+  private async loadDiscordEvents() {
     console.log('Loading DiscordBot events...');
 
-    const eventFiles = fs.readdirSync(`${__dirname}/events`).filter((file) => file.endsWith('.js'));
+    const path = '/events';
+    const eventFiles = fs.readdirSync(`${__dirname}${path}`).filter((file) => file.endsWith('.js'));
 
     let count = 0;
     for (const file of eventFiles) {
       const { once, event, handle } = (await import(
-        `./events/${file}`
+        `.${path}/${file}`
       )) as EventHandler<ClientEvents>;
       once ? this.once(event, handle) : this.on(event, handle);
       count++;
@@ -54,10 +62,10 @@ export class DiscordBot extends Client implements DiscordClient {
   }
 
   async login(token: string) {
-    await this.loadEvents();
+    await this.loadDiscordEvents();
+    this.setupEventBridge();
     await super.login(token);
     await this.loadChannels();
-    this.setupEventBridge();
     return '';
   }
 
