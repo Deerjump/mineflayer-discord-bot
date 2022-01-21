@@ -10,7 +10,8 @@ export function wait(milliseconds: number) {
 export function extractRole(string: string) {
   // Just the text between the first set of square brackets
   const regex = /\[(.*?)\]/;
-  return string.match(regex)?.[1];
+  const [, role] = string.match(regex) ?? [];
+  return role;
 }
 
 export function extractTime(string: string) {
