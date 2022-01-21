@@ -15,31 +15,34 @@ export interface DiscordBotOptions {
   chatChannelId: string;
   skipChannelId: string;
   loggingChannelId: string;
+  staffRoleId: string;
 }
 
 export interface MinecraftBotOptions extends BotOptions {
   prefix: string;
   parkourStart: Location;
+  parkourTimeBanThreshold: number;
 }
 
-type EventBridge = TypedEmitter<CustomEvents>;
+export type EventBridge = TypedEmitter<CustomEvents>;
 
-type InferParams<T> = T extends unknown[]
+export type InferParams<T> = T extends unknown[]
   ? T
   : T extends (...args: never) => unknown
   ? Parameters<T>
   : never;
 
-type Callback<T, R> = (...args: T) => R;
-type Predicate<T> = Callback<T, boolean>;
+export type Callback<T, R> = (...args: T) => R;
+export type Predicate<T> = Callback<T, boolean>;
 
-interface EventHandler<T, K extends keyof T = keyof T> {
+export interface EventHandler<T, K extends keyof T = keyof T> {
   event: K;
   once?: boolean;
   handle: (...args: InferParams<T[K]>) => void;
 }
 
-interface CustomEvents {
+export interface CustomEvents {
+  notifyStaff: (username: string, reason?: string) => void;
   discordMessage: (message: string) => void;
   minecraftMessage: (message: string) => void;
   connectionFailure: (reason: string) => void;
@@ -51,18 +54,18 @@ interface CustomEvents {
   skipRequestDenied: (skipInteraction: SkipInteraction) => void;
 }
 
-interface SkipInteraction {
+export interface SkipInteraction {
   requester: string;
   handledBy: string;
 }
 
-interface MinecraftCommand {
+export interface MinecraftCommand {
   name: string;
   aliases: string[];
   execute: (bot: MineflayerBot, username: string) => void;
 }
 
-interface MineflayerBot {
+export interface MineflayerBot {
   bot: Bot;
   commands: Collection<string, MinecraftCommand>;
   eventBridge: EventBridge;
@@ -71,7 +74,7 @@ interface MineflayerBot {
   teleportPlayer: (username: string, location: Location) => void;
 }
 
-interface Location {
+export interface Location {
   x: number;
   y: number;
   z: number;
