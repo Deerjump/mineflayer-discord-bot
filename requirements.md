@@ -6,7 +6,7 @@
 # Minecraft:
     - Log Minecraft chat to Discord channel ✔️
     - Send Discord messages from specific channel to Minecraft ✔️
-    - Bans the user if they complete the parkour in <4 minutes ❌
+    - Bans the user if they complete the parkour in <4 minutes ✔️
         /housing ban <user> ✔️
   ## Commands
     - !restart ✔️
@@ -19,7 +19,7 @@
             - Decline: ✔️
             - Finish: ✔️
     - !notifystaff
-        Pings staff in minecraft-bot-chat ❌
+        Pings staff in minecraft-bot-chat ✔️
 
 # Discord:
     - If accepted, bot sends a message in "confirmed skips" ✔️
