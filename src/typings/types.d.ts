@@ -1,5 +1,5 @@
 import { Awaitable, Client, ClientEvents, Intents, TextBasedChannel, User } from 'discord.js';
-import { BotEvents } from 'mineflayer';
+import { Bot, BotEvents, BotOptions } from 'mineflayer';
 import TypedEmitter from 'typed-emitter';
 
 export interface DiscordClient extends Client {
@@ -15,6 +15,11 @@ export interface DiscordBotOptions {
   chatChannelId: string;
   skipChannelId: string;
   loggingChannelId: string;
+}
+
+export interface MinecraftBotOptions extends BotOptions {
+  prefix: string;
+  parkourStart: Location;
 }
 
 type EventBridge = TypedEmitter<CustomEvents>;
@@ -54,5 +59,20 @@ interface SkipInteraction {
 interface MinecraftCommand {
   name: string;
   aliases: string[];
-  execute: (bot: Bot, username: string) => void;
+  execute: (bot: MineflayerBot, username: string) => void;
+}
+
+interface MineflayerBot {
+  bot: Bot;
+  commands: Collection<string, MinecraftCommand>;
+  eventBridge: EventBridge;
+  parkourStart: Location;
+
+  teleportPlayer: (username: string, location: Location) => void;
+}
+
+interface Location {
+  x: number;
+  y: number;
+  z: number;
 }

@@ -10,7 +10,7 @@
         /housing ban <user> ✔️
   ## Commands
     - !restart ✔️
-        Sends player to start of parkour
+        Sends player to start of parkour ✔️
     - !skip ✔️
         Sends a message in discord channel ✔️
           buttons: 
