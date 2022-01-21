@@ -11,6 +11,7 @@ import {
   FULL_HOUSE,
   HOUSING_ACTION_BAR,
   WHISPER_COMMAND,
+  BAN_COMMAND,
 } from './constants';
 
 export class MineflayerBot {
@@ -150,6 +151,11 @@ export class MineflayerBot {
     commands.forEach((command) => {
       this.commands.set(command.name, command);
     });
+  }
+
+  private ban(username: string, reason: string) {
+    this.bot.chat(`${BAN_COMMAND} ${username}`);
+    console.log(`${username} has been banned. Reason: ${reason}`);
   }
 
   private getCommand(message: string): MinecraftCommand | undefined {
