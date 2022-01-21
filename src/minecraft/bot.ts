@@ -1,6 +1,13 @@
 import { createBot, Bot, BotEvents } from 'mineflayer';
 import { extractRole, extractTime, wait } from '../utils/utils';
-import { EventBridge, Location, MinecraftBotOptions, MinecraftCommand, MineflayerBot, Predicate } from '@customTypes';
+import {
+  EventBridge,
+  Location,
+  MinecraftBotOptions,
+  MinecraftCommand,
+  MineflayerBot,
+  Predicate,
+} from '@customTypes';
 import { FIVE_SECONDS, HYPIXEL, TWO_SECONDS } from '../utils/constants';
 import fs from 'fs';
 import { Collection } from 'discord.js';
@@ -18,12 +25,14 @@ export class MinecraftBot implements MineflayerBot {
   readonly commands = new Collection<string, MinecraftCommand>();
   readonly eventBridge: EventBridge;
   bot: Bot;
-  private prefix: string;
   parkourStart: Location;
+  private prefix: string;
+  private parkourTimeBanThreshold: number;
 
   constructor(options: MinecraftBotOptions, eventBridge: EventBridge) {
     this.prefix = options.prefix;
     this.parkourStart = options.parkourStart;
+    this.parkourTimeBanThreshold = options.parkourTimeBanThreshold;
     this.eventBridge = eventBridge;
     this.loadCommands();
     this.bot = this.initializeBot(options);
@@ -88,9 +97,9 @@ export class MinecraftBot implements MineflayerBot {
       const [match, name, time] = message.match(regex) ?? [];
       if (!match) return;
       const [minutes, seconds, milliseconds] = extractTime(time);
-      if (minutes < 5) {
-        console.log('name:', name);
-        console.log('time:', `${minutes}:${seconds}.${milliseconds}`);
+      if (minutes < this.parkourTimeBanThreshold) {
+        console.log(`${name} was banned for hacking parkour.`, `Completion Time: ${time}`);
+        this.ban(name, 'Hacking');
       }
     });
   }
@@ -281,5 +290,5 @@ export class MinecraftBot implements MineflayerBot {
 
   teleportPlayer(username: string, { x, y, z }: Location) {
     this.bot.chat(`/tp ${username} ${x} ${y} ${z}`);
-  };
+  }
 }
