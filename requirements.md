@@ -1,7 +1,7 @@
 <!-- https://www.markdownguide.org/cheat-sheet/ -->
 
 # General
-    - Restart the bot automatically if it is stopped ❌
+    - Restart the bot automatically if it is stopped ✔️
 
 # Minecraft:
     - Log Minecraft chat to Discord channel ✔️

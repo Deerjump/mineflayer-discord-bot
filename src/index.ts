@@ -1,5 +1,4 @@
-import { config } from 'dotenv';
-config();
+import 'dotenv/config';
 import { MinecraftBot } from './minecraft/bot';
 import * as discordConfig from './discord/config';
 import * as mineflayerConfig from './minecraft/config';
