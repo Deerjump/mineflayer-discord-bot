@@ -18,6 +18,7 @@ const eventHandler = createEventHandler<ClientEvents>()({
   handle(message) {
     if (message.channelId !== options.chatChannelId || message.author.bot) return;
     if (shouldIgnore(message)) return;
+    
     const client = message.client as DiscordClient;
     const content = `${message.author.username}: ${message.content}`;
     client.eventBridge.emit('discordMessage', content);

@@ -3,8 +3,8 @@ import { MinecraftCommand } from '@customTypes';
 export const command: MinecraftCommand = {
   name: 'skip',
   aliases: [],
-  execute: ({ eventBridge }, username) => {
-    console.log(`skip`, username);
+  execute: (minecraftBot, username) => {
+    const { eventBridge } = minecraftBot
     eventBridge.emit('skipRequestCommand', username);
   },
 };

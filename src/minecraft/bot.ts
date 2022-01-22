@@ -62,7 +62,6 @@ export class MinecraftBot implements MineflayerBot {
         await bot.waitForChunksToLoad();
         await this.goToHousing();
         this.startChatListeners();
-        this.startSkipListeners();
         this.startCompletionTimeListener();
       });
     }
@@ -84,8 +83,6 @@ export class MinecraftBot implements MineflayerBot {
 
     // discord -> minecraft
     this.eventBridge.on('discordMessage', (message) => {
-      console.log(`[Minecraft]: ${message}`);
-      // this.getCommand(message)?.execute(this, this.bot.username);
       this.bot.chat(message);
     });
   }
@@ -96,45 +93,11 @@ export class MinecraftBot implements MineflayerBot {
       const regex = /^([a-zA-Z0-_]*) completed the parkour in (.*)!/;
       const [match, name, time] = message.match(regex) ?? [];
       if (!match) return;
-      const [minutes, seconds, milliseconds] = extractTime(time);
+      const [minutes] = extractTime(time);
       if (minutes < this.parkourTimeBanThreshold) {
         console.log(`${name} was banned for hacking parkour.`, `Completion Time: ${time}`);
         this.ban(name, 'Hacking');
       }
-    });
-  }
-
-  private startSkipListeners() {
-    this.eventBridge.on('skipRequestCreate', (username) => {
-      const player = this.bot.players[username];
-      if (player == null) return;
-      const response = 'Your request has been created and will be handled shortly';
-      const message = `${WHISPER_COMMAND} ${username} ${response}`;
-      this.bot.chat(message);
-    });
-
-    this.eventBridge.on('skipRequestCancelled', ({ requester, handledBy }) => {
-      const player = this.bot.players[requester];
-      if (player == null) return;
-      const response = `Your skip was cancelled by ${handledBy}`;
-      const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      this.bot.chat(message);
-    });
-
-    this.eventBridge.on('skipRequestApproved', ({ requester, handledBy }) => {
-      const player = this.bot.players[requester];
-      if (player == null) return;
-      const response = `Your skip was approved by ${handledBy}`;
-      const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      this.bot.chat(message);
-    });
-
-    this.eventBridge.on('skipRequestDenied', ({ requester, handledBy }) => {
-      const player = this.bot.players[requester];
-      if (player == null) return;
-      const response = `Your skip was denied by ${handledBy}`;
-      const message = `${WHISPER_COMMAND} ${requester} ${response}`;
-      this.bot.chat(message);
     });
   }
 
