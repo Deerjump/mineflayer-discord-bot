@@ -1,5 +1,5 @@
 {
-  "name": "minecraft-bot",
+  "name": "parkour-bot",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
@@ -8,22 +8,21 @@
     "start": "pm2 start ./dist/ecosystem.config.js",
     "stop": "pm2 stop ./dist/ecosystem.config.js",
     "delete": "pm2 delete ./dist/ecosystem.config.js",
-    "logs": "pm2 logs Scripticus",
+    "logs": "pm2 logs ./dist/ecosystem.config.js",
     "dev": "yarn clean && tsc --project tsconfig.json && node .",
     "prebuild": "yarn clean",
     "build": "tsc --project tsconfig.production.json",
     "clean": "rimraf dist/"
   },
   "dependencies": {
-    "discord.js": "^13.4.0",
-    "dotenv": "^10.0.0",
-    "mineflayer": "^3.13.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^14.2.0",
+    "mineflayer": "^3.14.1",
     "pm2": "^5.1.2",
-    "prismarine-viewer": "^1.21.0",
-    "typed-emitter": "^1.4.0"
+    "typed-emitter": "^2.0.0"
   },
   "devDependencies": {
     "rimraf": "3.0.2",
-    "typescript": "4.5.4"
+    "typescript": "4.5.5"
   }
 }
