@@ -23,6 +23,6 @@
 
 # Discord:
     - If accepted, bot sends a message in "confirmed skips" ✔️
-    - If there is a mention, don't send the message to minecraft ❌
-      - Also if there is a reply? ❌
+    - If there is a mention, don't send the message to minecraft ✔️
+      - Also if there is a reply? ✔️
     
