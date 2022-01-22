@@ -58,18 +58,12 @@ export class SkipManager {
           this.approveSkipRequest(request);
           break;
         case SKIP_DECLINE_ID:
-          this.denySkipRequest(request);
+          this.declineSkipRequest(request);
           break;
       }
       this.skipRequests.delete(requester);
       await interaction.deleteReply();
     });
-  }
-
-  private async logSkipResult(skipper: string, result: string) {
-    const logChannel = this.client.getLogChannel();
-    const embed = new MessageEmbed().setAuthor(skipper).setDescription(result);
-    await logChannel.send({ embeds: [embed] });
   }
 
   private async createSkipRequest(username: string) {
@@ -83,12 +77,22 @@ export class SkipManager {
     await this.client.getSkipChannel().send(request.toDiscordMessage());
   }
 
-  private approveSkipRequest({ username, acceptedBy }: SkipRequest) {
-    this.logSkipResult(username, `Approved by: ${acceptedBy}`);
+  private async approveSkipRequest({ username, acceptedBy }: SkipRequest) {
+    const embed = new MessageEmbed()
+      .setAuthor({ name: username })
+      .setColor('DARK_AQUA')
+      .setDescription(`Confirmed by: ${acceptedBy}`);
+
+    await this.client.getLogChannel().send({ embeds: [embed] });
   }
 
-  private denySkipRequest({ username, acceptedBy }: SkipRequest) {
-    this.logSkipResult(username, `Denied by: ${acceptedBy}`);
+  private async declineSkipRequest({ username, acceptedBy }: SkipRequest) {
+    const embed = new MessageEmbed()
+      .setAuthor({ name: username })
+      .setColor('RED')
+      .setDescription(`Declined by: ${acceptedBy}`);
+
+    await this.client.getLogChannel().send({ embeds: [embed] });
   }
 }
 
@@ -108,10 +112,7 @@ export class SkipRequest {
     }
 
     embed.setDescription(`Accepted by: **${this.acceptedBy}**`);
-    const row = new MessageActionRow().setComponents(
-      SKIP_CONFIRM_BUTTON,
-      SKIP_DECLINE_BUTTON,
-    );
+    const row = new MessageActionRow().setComponents(SKIP_CONFIRM_BUTTON, SKIP_DECLINE_BUTTON);
     components.push(row);
 
     return { embeds: [embed], components: [row] };
