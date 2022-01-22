@@ -1,6 +1,5 @@
 import { DiscordClient } from '@customTypes';
 import {
-  ButtonInteraction,
   Collection,
   MessageActionRow,
   MessageEmbed,
@@ -28,6 +27,7 @@ export class SkipManager {
     this.client.on('interactionCreate', async (interaction) => {
       if (!interaction.isButton()) return;
       if (interaction.channelId != this.client.getSkipChannel().id) return;
+
       await interaction.deferUpdate();
 
       const { user } = interaction;
@@ -49,16 +49,16 @@ export class SkipManager {
         return;
       }
 
-      switch ((interaction as ButtonInteraction).customId) {
+      switch (interaction.customId) {
         case SKIP_ACCEPT_ID:
           request.accept(user);
           await interaction.editReply(request.toDiscordMessage());
           return;
         case SKIP_CONFIRM_ID:
-          this.approveSkipRequest(request);
+          await this.confirmSkipRequest(request);
           break;
         case SKIP_DECLINE_ID:
-          this.declineSkipRequest(request);
+          await this.declineSkipRequest(request);
           break;
       }
       this.skipRequests.delete(requester);
@@ -77,7 +77,7 @@ export class SkipManager {
     await this.client.getSkipChannel().send(request.toDiscordMessage());
   }
 
-  private async approveSkipRequest({ username, acceptedBy }: SkipRequest) {
+  private async confirmSkipRequest({ username, acceptedBy }: SkipRequest) {
     const embed = new MessageEmbed()
       .setAuthor({ name: username })
       .setColor('DARK_AQUA')
@@ -102,16 +102,17 @@ export class SkipRequest {
   constructor(readonly username: string) {}
 
   toDiscordMessage(): MessageOptions {
-    const embed = new MessageEmbed().setAuthor(this.username);
+    const embed = new MessageEmbed().setAuthor({ name: this.username });
     let components = [];
 
     if (!this.acceptedBy) {
-      embed.setDescription('wants to skip!');
+      embed.setDescription('wants to skip!').setColor('GREYPLE');
       components.push(new MessageActionRow().setComponents(SKIP_ACCEPT_BUTTON));
       return { embeds: [embed], components };
     }
 
-    embed.setDescription(`Accepted by: **${this.acceptedBy}**`);
+    const thumbnail = this.acceptedBy.avatarURL({ dynamic: true }) ?? '';
+    embed.setDescription(`Accepted by: **${this.acceptedBy}**`).setColor('GREEN').setThumbnail(thumbnail);
     const row = new MessageActionRow().setComponents(SKIP_CONFIRM_BUTTON, SKIP_DECLINE_BUTTON);
     components.push(row);
 
