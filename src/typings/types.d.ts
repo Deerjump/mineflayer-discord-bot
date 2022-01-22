@@ -49,11 +49,6 @@ export interface CustomEvents {
   skipRequestCommand: (username: string) => void;
 }
 
-export interface SkipInteraction {
-  requester: string;
-  handledBy: string;
-}
-
 export interface MinecraftCommand {
   name: string;
   aliases: string[];
