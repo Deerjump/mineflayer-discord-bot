@@ -6,9 +6,10 @@
   "scripts": {
     "prestart": "yarn build",
     "start": "pm2 start ./dist/ecosystem.config.js",
+    "poststart": "pm2 monit",
     "stop": "pm2 stop ./dist/ecosystem.config.js",
     "delete": "pm2 delete ./dist/ecosystem.config.js",
-    "logs": "pm2 logs ./dist/ecosystem.config.js",
+    "logs": "pm2 logs 0",
     "dev": "yarn clean && tsc --project tsconfig.json && node .",
     "prebuild": "yarn clean",
     "build": "tsc --project tsconfig.production.json",
