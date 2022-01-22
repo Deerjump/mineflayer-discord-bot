@@ -47,11 +47,6 @@ export interface CustomEvents {
   minecraftMessage: (message: string) => void;
   connectionFailure: (reason: string) => void;
   skipRequestCommand: (username: string) => void;
-  skipRequestFail: (username: string, reason: string) => void;
-  skipRequestCreate: (username: string) => void;
-  skipRequestCancelled: (skipInteraction: SkipInteraction) => void;
-  skipRequestApproved: (skipInteraction: SkipInteraction) => void;
-  skipRequestDenied: (skipInteraction: SkipInteraction) => void;
 }
 
 export interface SkipInteraction {

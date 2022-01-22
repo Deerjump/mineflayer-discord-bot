@@ -10,12 +10,10 @@ import {
 import {
   SKIP_ACCEPT_BUTTON,
   SKIP_ACCEPT_ID,
-  SKIP_APPROVE_BUTTON,
-  SKIP_APPROVE_ID,
-  SKIP_CANCEL_BUTTON,
-  SKIP_CANCEL_ID,
-  SKIP_DENY_BUTTON,
-  SKIP_DENY_ID,
+  SKIP_DECLINE_BUTTON,
+  SKIP_DECLINE_ID,
+  SKIP_CONFIRM_ID,
+  SKIP_CONFIRM_BUTTON,
 } from '../discord/constants';
 
 export class SkipManager {
@@ -56,13 +54,10 @@ export class SkipManager {
           request.accept(user);
           await interaction.editReply(request.toDiscordMessage());
           return;
-        case SKIP_CANCEL_ID:
-          this.cancelSkipRequest(request);
-          break;
-        case SKIP_APPROVE_ID:
+        case SKIP_CONFIRM_ID:
           this.approveSkipRequest(request);
           break;
-        case SKIP_DENY_ID:
+        case SKIP_DECLINE_ID:
           this.denySkipRequest(request);
           break;
       }
@@ -79,46 +74,21 @@ export class SkipManager {
 
   private async createSkipRequest(username: string) {
     if (this.skipRequests.has(username)) {
-      this.client.eventBridge.emit(
-        'skipRequestFail',
-        username,
-        'An active skip request already exists!'
-      );
       return;
     }
 
     const request = new SkipRequest(username);
     this.skipRequests.set(username, request);
-    this.client.eventBridge.emit(
-      'skipRequestCreate',
-      username  
-    );
 
     await this.client.getSkipChannel().send(request.toDiscordMessage());
   }
 
   private approveSkipRequest({ username, acceptedBy }: SkipRequest) {
-    this.logSkipResult(username, `Approved by: ${acceptedBy?.username}`);
-    this.client.eventBridge.emit('skipRequestApproved', {
-      requester: username,
-      handledBy: acceptedBy?.username!,
-    });
+    this.logSkipResult(username, `Approved by: ${acceptedBy}`);
   }
 
   private denySkipRequest({ username, acceptedBy }: SkipRequest) {
-    this.logSkipResult(username, `Denied by: ${acceptedBy?.username}`);
-    this.client.eventBridge.emit('skipRequestDenied', {
-      requester: username,
-      handledBy: acceptedBy?.username!,
-    });
-  }
-
-  private async cancelSkipRequest({ username, acceptedBy }: SkipRequest) {
-    this.logSkipResult(username, `Canceled by: ${acceptedBy?.username}`);
-    this.client.eventBridge.emit('skipRequestCancelled', {
-      requester: username,
-      handledBy: acceptedBy?.username!,
-    });
+    this.logSkipResult(username, `Denied by: ${acceptedBy}`);
   }
 }
 
@@ -137,11 +107,10 @@ export class SkipRequest {
       return { embeds: [embed], components };
     }
 
-    embed.setDescription(`Accepted by: **${this.acceptedBy.username}**`);
+    embed.setDescription(`Accepted by: **${this.acceptedBy}**`);
     const row = new MessageActionRow().setComponents(
-      SKIP_APPROVE_BUTTON,
-      SKIP_DENY_BUTTON,
-      SKIP_CANCEL_BUTTON
+      SKIP_CONFIRM_BUTTON,
+      SKIP_DECLINE_BUTTON,
     );
     components.push(row);
 
