@@ -1,0 +1,3 @@
+- Link discord account to minecraft account
+- track number of skips per person.
+- track confirms/declines per staff

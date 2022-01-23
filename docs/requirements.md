@@ -18,7 +18,7 @@
             - Cancel: ✔️
             - Decline: ✔️
             - Finish: ✔️
-    - !notifystaff
+    - !notifystaff ✔️
         Pings staff in minecraft-bot-chat ✔️
 
 # Discord:
