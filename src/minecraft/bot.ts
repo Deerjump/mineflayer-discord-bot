@@ -17,7 +17,6 @@ import {
   TRY_AGAIN,
   FULL_HOUSE,
   HOUSING_ACTION_BAR,
-  WHISPER_COMMAND,
   BAN_COMMAND,
 } from './constants';
 
@@ -28,8 +27,10 @@ export class MinecraftBot implements MineflayerBot {
   parkourStart: Location;
   private prefix: string;
   private parkourTimeBanThreshold: number;
+  private options: MinecraftBotOptions;
 
   constructor(options: MinecraftBotOptions, eventBridge: EventBridge) {
+    this.options = options;
     this.prefix = options.prefix;
     this.parkourStart = options.parkourStart;
     this.parkourTimeBanThreshold = options.parkourTimeBanThreshold;
@@ -248,7 +249,7 @@ export class MinecraftBot implements MineflayerBot {
     await this.goToHousingLobby();
     console.log('In housing lobby');
     await wait(TWO_SECONDS);
-    this.visitHousingServer('wuved');
+    this.visitHousingServer(this.options.housingOwner);
   }
 
   teleportPlayer(username: string, { x, y, z }: Location) {

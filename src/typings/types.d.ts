@@ -19,6 +19,7 @@ export interface DiscordBotOptions {
 }
 
 export interface MinecraftBotOptions extends BotOptions {
+  housingOwner: string;
   prefix: string;
   parkourStart: Location;
   parkourTimeBanThreshold: number;

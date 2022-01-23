@@ -9,7 +9,7 @@ export const options: MinecraftBotOptions = {
   host: HYPIXEL,
   version: '1.17.1',
   logErrors: true,
-  
+
   // custom options
   prefix: '!',
   parkourTimeBanThreshold: 4,
@@ -17,5 +17,6 @@ export const options: MinecraftBotOptions = {
     x: 39.5,
     y: 97.5,
     z: -29
-  }
+  },
+  housingOwner: 'bunabii'
 };
