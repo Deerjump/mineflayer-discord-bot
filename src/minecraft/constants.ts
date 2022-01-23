@@ -6,3 +6,6 @@ export const TRY_AGAIN = 'Try again in a second.';
 export const BAN_COMMAND = '/housing ban'
 export const PARKOUR_COMPLETION_MESSAGE = 'completed the parkour in'
 export const WHISPER_COMMAND = '/msg'
+
+
+// TODO: An exception occurred in your connection, so you were put in the Housing Lobby!
