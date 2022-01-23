@@ -11,12 +11,17 @@ export const options: MinecraftBotOptions = {
   logErrors: true,
 
   // custom options
+  housingOwner: 'Bunabii',
   prefix: '!',
   parkourTimeBanThreshold: 4,
+  whereToStand: {
+    x: -36.5,
+    y: 179,
+    z: 23.5
+  },
   parkourStart: {
     x: 39.5,
     y: 97.5,
     z: -29
   },
-  housingOwner: 'bunabii'
 };

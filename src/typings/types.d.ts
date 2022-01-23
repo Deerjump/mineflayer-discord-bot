@@ -23,6 +23,7 @@ export interface MinecraftBotOptions extends BotOptions {
   prefix: string;
   parkourStart: Location;
   parkourTimeBanThreshold: number;
+  whereToStand: Location;
 }
 
 export type EventBridge = TypedEmitter<CustomEvents>;

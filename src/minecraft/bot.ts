@@ -13,7 +13,6 @@ import fs from 'fs';
 import { Collection } from 'discord.js';
 import {
   ALREADY_CONNECTED,
-  HOUSING_TITLE,
   TRY_AGAIN,
   FULL_HOUSE,
   HOUSING_ACTION_BAR,
@@ -155,14 +154,17 @@ export class MinecraftBot implements MineflayerBot {
         return position === 'chat' && message === ALREADY_CONNECTED;
       }),
     ]);
+    console.log('In housing lobby');
   }
 
   private async visitHousingServer(name: string) {
+    console.log(`Visiting ${name}'s house`);
     this.bot.chat(`/visit ${name}`);
 
     return new Promise<void>((resolve) => {
       this.bot.once('windowOpen', async (window) => {
-        if (!window.title.includes(HOUSING_TITLE)) return;
+        const expectedTitle = `${this.options.housingOwner}\\u0027s Houses`.toLowerCase();
+        if (!window.title.toLowerCase().includes(expectedTitle)) return;
         const item = window.containerItems().find((item) => item != null);
         window.requiresConfirmation = false;
         if (item == null) {
@@ -183,6 +185,7 @@ export class MinecraftBot implements MineflayerBot {
             case 'game_info': {
               if (!message.includes(HOUSING_ACTION_BAR)) return;
               console.log('Successfully arrived at housing server');
+              this.teleport(this.options.whereToStand);
               resolve();
               break;
             }
@@ -190,28 +193,6 @@ export class MinecraftBot implements MineflayerBot {
               return;
           }
           this.bot.removeListener('messagestr', handler);
-        };
-
-        const failureHandler = async (message: string, position: string) => {
-          if (position !== 'chat') return;
-          if (!message.includes(TRY_AGAIN) && !message.includes(FULL_HOUSE)) return;
-
-          // send warning to discord
-          this.eventBridge.emit('connectionFailure', message);
-
-          this.bot.removeListener('messagestr', failureHandler);
-          this.bot.removeListener('messagestr', successHandler);
-          await wait(FIVE_SECONDS);
-          await this.visitHousingServer(name);
-        };
-
-        const successHandler = (message: string, position: string) => {
-          if (position !== 'game_info') return;
-          if (!message.includes(HOUSING_ACTION_BAR)) return;
-          console.log('Successfully arrived at housing server');
-          this.bot.removeListener('messagestr', failureHandler);
-          this.bot.removeListener('messagestr', successHandler);
-          resolve();
         };
 
         this.bot.on('messagestr', handler);
@@ -247,9 +228,13 @@ export class MinecraftBot implements MineflayerBot {
   private async goToHousing() {
     await wait(TWO_SECONDS);
     await this.goToHousingLobby();
-    console.log('In housing lobby');
     await wait(TWO_SECONDS);
     this.visitHousingServer(this.options.housingOwner);
+  }
+
+  teleport({x, y, z}: Location) {
+    console.log(`Teleporting to ${x} ${y} ${z}`);
+    this.bot.chat(`/tp ${x} ${y} ${z}`);
   }
 
   teleportPlayer(username: string, { x, y, z }: Location) {
